@@ -806,6 +806,7 @@ h1 {
         </div>
       
           <script>
+            
   const banner = document.querySelector('.banner');
 const images = document.querySelectorAll('.banner-image');
 const dotsContainer = document.getElementById('navigationDots');
@@ -4702,15 +4703,16 @@ modal.addEventListener('click', (event) => {
   <div class="video-gallery-grid">
       <!-- Tạo 16 video -->
       <div class="video-container">
-          <video controls>
-              <source src="video/video1.mp4" type="video/mp4">
-          </video>
-      </div>
-      <div class="video-container">
-          <video controls>
-              <source src="video/video2.mp4" type="video/mp4">
-          </video>
-      </div>
+        <video controls>
+            <source src="video/video1.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="video-container">
+        <video controls>
+            <source src="video/video2.mp4" type="video/mp4">
+        </video>
+    </div>
       <div class="video-container">
           <video controls>
               <source src="video/video3.mp4" type="video/mp4">
@@ -4966,6 +4968,18 @@ modal.addEventListener('click', (event) => {
 
 let castSession = null;
 
+
+document.getElementById('castButton').addEventListener('click', () => {
+    const currentVideo = document.querySelector('.video-container video');
+    if (currentVideo && currentVideo.querySelector('source')) {
+        const videoUrl = currentVideo.querySelector('source').src;
+        loadMedia(videoUrl);
+    } else {
+        alert('Không tìm thấy video để phát.');
+    }
+});
+
+
 function initializeCastApi() {
     cast.framework.CastContext.getInstance().setOptions({
         receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
@@ -4979,20 +4993,14 @@ window['__onGCastApiAvailable'] = (isAvailable) => {
     }
 };
 
-document.getElementById('castButton').addEventListener('click', () => {
-    const context = cast.framework.CastContext.getInstance();
-    context.requestSession().then(() => {
-        castSession = context.getCurrentSession();
-        const videoElement = document.querySelector('video');
-        loadMedia(videoElement.src);
-    }).catch((error) => {
-        console.log('Error starting cast session:', error);
-    });
-});
-
 function loadMedia(videoUrl) {
     if (!castSession) {
         console.log('No cast session available');
+        return;
+    }
+
+    if (!videoUrl) {
+        console.log('Không có URL video để phát.');
         return;
     }
 
@@ -5006,57 +5014,22 @@ function loadMedia(videoUrl) {
     });
 }
 
-
-function toggleMenu() {
-    const menuContent = document.getElementById('menuContent');
-    if (menuContent.style.display === 'none' || menuContent.style.display === '') {
-        menuContent.style.display = 'block';
-        hideVideoIntro();
-    } else {
-        menuContent.style.display = 'none';
-        showVideoIntro();
+function toggleSectionVisibility(sectionId, isVisible) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.style.display = isVisible ? 'block' : 'none';
     }
 }
 
 function showVideoGallery() {
-    document.getElementById('videoGallery').style.display = 'block';
-    hideVideoIntro();
-    document.getElementById('menuContent').style.display = 'none';
+    toggleSectionVisibility('videoGallery', true);
 }
 
 function closeVideoGallery() {
-    document.getElementById('videoGallery').style.display = 'none';
-    showVideoIntro();
-}
-
-function hideVideoIntro() {
-    document.getElementById('videoIntro').style.visibility = 'hidden';
-}
-
-function showVideoIntro() {
-    document.getElementById('videoIntro').style.visibility = 'visible';
+    toggleSectionVisibility('videoGallery', false);
 }
 
 
-// Hiển thị Video Gallery và thu nhỏ phần giới thiệu
-function showVideoGallery() {
-    document.getElementById('videoGallery').style.display = 'block';
-    document.getElementById('videoIntro').classList.add('compact');
-    document.getElementById('menuContent').style.display = 'none';
-}
-
-// Đóng Video Gallery và khôi phục phần giới thiệu
-function closeVideoGallery() {
-    document.getElementById('videoGallery').style.display = 'none';
-    document.getElementById('videoIntro').classList.remove('compact');
-}
-
-// Hiển thị trang chủ và khôi phục phần giới thiệu
-function showHome() {
-    document.getElementById('videoIntro').classList.remove('compact');
-    document.getElementById('videoGallery').style.display = 'none';
-    document.getElementById('menuContent').style.display = 'none';
-}
 
 </script>
 </body>
